@@ -31,7 +31,7 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Debug para verificar
 print("🧠 DB URI en arranque ->", app.config['SQLALCHEMY_DATABASE_URI'])
 
-app.secret_key = "mesa-perfecta-key"  # mueve a .env cuando quieras
+app.secret_key = os.environ.get("SECRET_KEY", "mesa-perfecta-key")  # mueve a .env cuando quieras
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 # DB
