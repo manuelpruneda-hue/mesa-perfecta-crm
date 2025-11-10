@@ -592,7 +592,8 @@ def ingresos():
         return render_template(
             'ingresos.html',
             ingresos=ingresos_rows,
-            sum_neto=sum_neto, sum_iva=sum_iva, sum_total=sum_total
+            sum_neto=sum_neto, sum_iva=sum_iva, sum_total=sum_total,
+            q=q, desde=desde, hasta=hasta
         )
     except Exception as e:
         print("ERROR /ingresos:", repr(e))
@@ -603,15 +604,15 @@ def ingresos():
 @require_login
 def nuevo_ingreso():
     if request.method == 'POST':
-        fecha = request.form['fecha']
-        cliente = request.form['cliente'].strip()
-        medio_pago = request.form['medio_pago']
-        tipo_doc = request.form['tipo_doc']
-        monto_neto = float(request.form['monto_neto'])
+        fecha = request.form.get('fecha', datetime.now().strftime("%Y-%m-%d"))
+        cliente = request.form.get('cliente', '').strip()
+        medio_pago = request.form.get('medio_pago')
+        tipo_doc = request.form.get('tipo_doc')
+        monto_neto = to_float(request.form.get('monto_neto'))
         iva_debito = round(monto_neto * IVA_RATE, 2)
         total = monto_neto + iva_debito
-        categoria = request.form['categoria']
-        observaciones = request.form['observaciones']
+        categoria = request.form.get('categoria', '')
+        observaciones = request.form.get('observaciones', '')
 
         ensure_cliente(cliente)
 
@@ -625,7 +626,17 @@ def nuevo_ingreso():
         conn.commit()
         rid = cur.lastrowid
         conn.close()
-        log_change("ingresos", rid, "insert", session["user"]["username"], json.dumps({"total": total}))
+        log_change(
+            "ingresos",
+            rid,
+            "insert",
+            session["user"]["username"],
+            json.dumps({
+                "cliente": cliente,
+                "monto_neto": monto_neto,
+                "total": total
+            })
+        )
         return redirect(url_for('ingresos'))
 
     conn = get_db()
@@ -638,26 +649,36 @@ def nuevo_ingreso():
 def editar_ingreso(item_id):
     db = get_db()
     if request.method == "POST":
-        fecha = request.form["fecha"]
-        cliente = request.form["cliente"].strip()
-        medio_pago = request.form["medio_pago"]
-        tipo_doc = request.form["tipo_doc"]
-        monto_neto = float(request.form["monto_neto"])
+        fecha = request.form.get("fecha")
+        cliente = request.form.get("cliente", "").strip()
+        medio_pago = request.form.get("medio_pago")
+        tipo_doc = request.form.get("tipo_doc")
+        monto_neto = to_float(request.form.get("monto_neto"))
         iva_debito = round(monto_neto * IVA_RATE, 2)
         total = monto_neto + iva_debito
-        categoria = request.form["categoria"]
-        observaciones = request.form["observaciones"]
+        categoria = request.form.get("categoria", "")
+        observaciones = request.form.get("observaciones", "")
 
         ensure_cliente(cliente)
 
         db.execute("""
-            UPDATE ingresos 
+            UPDATE ingresos
             SET fecha=?, cliente=?, medio_pago=?, tipo_doc=?, monto_neto=?, iva_debito=?, total=?, categoria=?, observaciones=?
             WHERE id=?
         """, (fecha, cliente, medio_pago, tipo_doc, monto_neto, iva_debito, total, categoria, observaciones, item_id))
         db.commit()
         db.close()
-        log_change("ingresos", item_id, "update", session["user"]["username"], json.dumps({"total": total}))
+        log_change(
+            "ingresos",
+            item_id,
+            "update",
+            session["user"]["username"],
+            json.dumps({
+                "cliente": cliente,
+                "monto_neto": monto_neto,
+                "total": total
+            })
+        )
         flash("✅ Ingreso actualizado correctamente.", "success")
         return redirect(url_for("ingresos"))
 
@@ -695,12 +716,12 @@ def egresos():
     desde = (request.args.get('desde') or '').strip()
     hasta = (request.args.get('hasta') or '').strip()
 
-    sql = 'SELECT * FROM egresos WHERE 1=1'
+    base_where = 'WHERE 1=1'
     params = []
 
     if q:
         like = f'%{q}%'
-        sql += ''' AND (
+        base_where += ''' AND (
             LOWER(COALESCE(proveedor,'')) LIKE ? OR
             LOWER(COALESCE(medio_pago,'')) LIKE ? OR
             LOWER(COALESCE(tipo_doc,'')) LIKE ? OR
@@ -710,13 +731,13 @@ def egresos():
         params += [like, like, like, like, like]
 
     if desde:
-        sql += ' AND date(fecha) >= date(?)'
+        base_where += ' AND date(fecha) >= date(?)'
         params.append(desde)
     if hasta:
-        sql += ' AND date(fecha) <= date(?)'
+        base_where += ' AND date(fecha) <= date(?)'
         params.append(hasta)
 
-    sql += ' ORDER BY date(fecha) DESC, id DESC'
+    sql = f'SELECT * FROM egresos {base_where} ORDER BY date(fecha) DESC, id DESC'
 
     conn = get_db()
     egresos_rows = conn.execute(sql, params).fetchall()
@@ -726,14 +747,14 @@ def egresos():
     # Totales
     sums = conn.execute(
         f"""
-        SELECT 
+        SELECT
             COALESCE(SUM(monto_neto), 0) AS sum_neto,
             COALESCE(SUM(iva_credito), 0) AS sum_iva,
             COALESCE(SUM(total), 0) AS sum_total
         FROM egresos
-        WHERE 1=1
-        { ' AND (' + ' OR '.join(['1=1']) + ')' if False else '' }
-        """
+        {base_where}
+        """,
+        params
     ).fetchone()
     conn.close()
 
@@ -745,22 +766,23 @@ def egresos():
         'egresos.html',
         egresos=egresos_rows,
         sum_neto=sum_neto, sum_iva=sum_iva, sum_total=sum_total,
-        proveedores=proveedores
+        proveedores=proveedores,
+        q=q, desde=desde, hasta=hasta
     )
 
 @app.route('/egresos/nuevo', methods=['GET', 'POST'])
 @require_login
 def nuevo_egreso():
     if request.method == 'POST':
-        fecha = request.form['fecha']
-        proveedor = request.form['proveedor'].strip()
-        medio_pago = request.form['medio_pago']
-        tipo_doc = request.form['tipo_doc']
-        monto_neto = float(request.form['monto_neto'])
+        fecha = request.form.get('fecha', datetime.now().strftime("%Y-%m-%d"))
+        proveedor = request.form.get('proveedor', '').strip()
+        medio_pago = request.form.get('medio_pago')
+        tipo_doc = request.form.get('tipo_doc')
+        monto_neto = to_float(request.form.get('monto_neto'))
         iva_credito = round(monto_neto * IVA_RATE, 2)
         total = monto_neto + iva_credito
-        categoria = request.form['categoria']
-        observaciones = request.form['observaciones']
+        categoria = request.form.get('categoria', '')
+        observaciones = request.form.get('observaciones', '')
 
         ensure_proveedor(proveedor)
 
@@ -774,7 +796,17 @@ def nuevo_egreso():
         conn.commit()
         rid = cur.lastrowid
         conn.close()
-        log_change("egresos", rid, "insert", session["user"]["username"], json.dumps({"total": total}))
+        log_change(
+            "egresos",
+            rid,
+            "insert",
+            session["user"]["username"],
+            json.dumps({
+                "proveedor": proveedor,
+                "monto_neto": monto_neto,
+                "total": total
+            })
+        )
         return redirect(url_for('egresos'))
     conn = get_db()
     proveedores = conn.execute("SELECT * FROM proveedores_master WHERE activo=1 ORDER BY nombre ASC").fetchall()
@@ -786,11 +818,11 @@ def nuevo_egreso():
 def editar_egreso(item_id):
     db = get_db()
     if request.method == "POST":
-        fecha = request.form["fecha"]
-        proveedor = request.form["proveedor"].strip()
-        medio_pago = request.form["medio_pago"]
-        tipo_doc = request.form["tipo_doc"]
-        monto_neto = float(request.form["monto_neto"])
+        fecha = request.form.get("fecha")
+        proveedor = request.form.get("proveedor", "").strip()
+        medio_pago = request.form.get("medio_pago")
+        tipo_doc = request.form.get("tipo_doc")
+        monto_neto = to_float(request.form.get("monto_neto"))
         iva_credito = round(monto_neto * IVA_RATE, 2)
         total = monto_neto + iva_credito
         categoria = request.form.get("categoria", "")
@@ -807,7 +839,17 @@ def editar_egreso(item_id):
               monto_neto, iva_credito, total, categoria, observaciones, item_id))
         db.commit()
         db.close()
-        log_change("egresos", item_id, "update", session["user"]["username"], json.dumps({"total": total}))
+        log_change(
+            "egresos",
+            item_id,
+            "update",
+            session["user"]["username"],
+            json.dumps({
+                "proveedor": proveedor,
+                "monto_neto": monto_neto,
+                "total": total
+            })
+        )
         flash("✅ Egreso actualizado correctamente.", "success")
         return redirect(url_for("egresos"))
 
@@ -1698,7 +1740,8 @@ def ingresos():
     return render_template(
         'ingresos.html',
         ingresos=ingresos_rows,
-        sum_neto=sum_neto, sum_iva=sum_iva, sum_total=sum_total
+        sum_neto=sum_neto, sum_iva=sum_iva, sum_total=sum_total,
+        q=q, desde=desde, hasta=hasta
     )
 
 @app.route('/ingresos/nuevo', methods=['GET', 'POST'])
@@ -1730,7 +1773,17 @@ def nuevo_ingreso():
         rid = cur.lastrowid
         # (Fix #4) No se usa conn.close()
         
-        log_change("ingresos", rid, "insert", session["user"]["username"], json.dumps({"total": total}))
+        log_change(
+            "ingresos",
+            rid,
+            "insert",
+            session["user"]["username"],
+            json.dumps({
+                "cliente": cliente,
+                "monto_neto": monto_neto,
+                "total": total
+            })
+        )
         
         # (Fix #9) Redirección ya era correcta
         return redirect(url_for('ingresos'))
@@ -1767,7 +1820,17 @@ def editar_ingreso(item_id):
         db.commit()
         # (Fix #4) No se usa db.close()
         
-        log_change("ingresos", item_id, "update", session["user"]["username"], json.dumps({"total": total}))
+        log_change(
+            "ingresos",
+            item_id,
+            "update",
+            session["user"]["username"],
+            json.dumps({
+                "cliente": cliente,
+                "monto_neto": monto_neto,
+                "total": total
+            })
+        )
         flash("✅ Ingreso actualizado correctamente.", "success")
         
         # (Fix #9) Redirección ya era correcta
@@ -1865,7 +1928,8 @@ def egresos():
         'egresos.html',
         egresos=egresos_rows,
         sum_neto=sum_neto, sum_iva=sum_iva, sum_total=sum_total,
-        proveedores=proveedores
+        proveedores=proveedores,
+        q=q, desde=desde, hasta=hasta
     )
 
 @app.route('/egresos/nuevo', methods=['GET', 'POST'])
@@ -1897,7 +1961,17 @@ def nuevo_egreso():
         rid = cur.lastrowid
         # (Fix #4) No se usa conn.close()
         
-        log_change("egresos", rid, "insert", session["user"]["username"], json.dumps({"total": total}))
+        log_change(
+            "egresos",
+            rid,
+            "insert",
+            session["user"]["username"],
+            json.dumps({
+                "proveedor": proveedor,
+                "monto_neto": monto_neto,
+                "total": total
+            })
+        )
         
         # (Fix #9) Redirección ya era correcta
         return redirect(url_for('egresos'))
@@ -1936,7 +2010,17 @@ def editar_egreso(item_id):
         db.commit()
         # (Fix #4) No se usa db.close()
         
-        log_change("egresos", item_id, "update", session["user"]["username"], json.dumps({"total": total}))
+        log_change(
+            "egresos",
+            item_id,
+            "update",
+            session["user"]["username"],
+            json.dumps({
+                "proveedor": proveedor,
+                "monto_neto": monto_neto,
+                "total": total
+            })
+        )
         flash("✅ Egreso actualizado correctamente.", "success")
         
         # (Fix #9) Redirección ya era correcta
