@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Mesa Perfecta CRM{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style>
+    body {
+      font-family: 'Montserrat', sans-serif;
+      margin: 0;
+      background-color: #0e0e0e;
+      color: #f5f5f5;
+    }
+    header {
+      background-color: #000;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 25px;
+      border-bottom: 1px solid #222;
+      flex-wrap: wrap;
+    }
+    .logo-zone {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .logo-zone img {
+      height: 42px;
+      border-radius: 8px;
+    }
+    nav {
+      background-color: #111;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      padding: 10px 25px;
+      border-bottom: 1px solid #333;
+    }
+    nav a {
+      color: #f5f5f5;
+      text-decoration: none;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: 0.2s;
+    }
+    nav a:hover {
+      color: #d4af37;
+      transform: scale(1.05);
+    }
+    .container {
+      background: #181818;
+      border-radius: 12px;
+      padding: 25px;
+      margin: 35px auto;
+      max-width: 1150px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.4);
+    }
+    footer {
+      text-align: center;
+      background: #000;
+      color: #f5f5f5;
+      padding: 15px;
+      font-size: 0.9em;
+      border-top: 1px solid #222;
+    }
+    .alert {
+      background: #f8d7da;
+      color: #721c24;
+      padding: 12px 16px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+    }
+    h1 {
+      color: #fff;
+      margin-top: 0;
+      font-size: 2rem;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      border-bottom: 1px solid #333;
+      padding: 10px;
+    }
+    th {
+      color: #d4af37;
+    }
+    a.button, button {
+      background-color: #d4af37;
+      border: none;
+      color: #000;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: 0.2s;
+      cursor: pointer;
+    }
+    a.button:hover, button:hover {
+      background-color: #e0b84e;
+      transform: translateY(-1px);
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="logo-zone">
+      <img src="{{ url_for('static', filename='logo_mp_blanco.png') }}" alt="Mesa Perfecta Logo">
+      <strong style="font-size:1.3rem;">Mesa Perfecta</strong>
+    </div>
+    {% if current_user %}
+    <div>
+      Sesión: {{ current_user.username }} ({{ current_user.role }})
+    </div>
+    {% endif %}
+  </header>
+
+  <nav>
+    <a href="{{ url_for('index') }}">🏠 Dashboard</a>
+    <a href="{{ url_for('ingresos') }}">📥 Ingresos</a>
+    <a href="{{ url_for('egresos') }}">📤 Egresos</a>
+    <a href="{{ url_for('crm') }}">👥 CRM</a>
+    <a href="{{ url_for('reporte') }}">📊 Reporte SII</a>
+    <a href="{{ url_for('cuentas') }}">🏦 Cuentas</a>
+    <a href="{{ url_for('transferir') }}">💸 Transferir</a>
+    <a href="{{ url_for('agenda') }}">🗓️ Agenda</a>
+    <a href="{{ url_for('pedidos') }}">🧾 Pedidos</a>
+    <a href="{{ url_for('inventario') }}">📦 Inventario</a>
+    <a href="{{ url_for('bom') }}">🧮 BOM</a>
+    <a href="{{ url_for('usuarios') }}">👤 Usuarios</a>
+    <a href="{{ url_for('logout') }}" style="margin-left:auto;">🚪 Salir</a>
+  </nav>
+
+  <main>
+    <div class="container">
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+      {% endwith %}
+
+      {% block content %}{% endblock %}
+    </div>
+  </main>
+
+  <footer>
+    © 2025 Mesa Perfecta · Hecho con cariño y buen diente 🍀
+  </footer>
+</body>
+</html>

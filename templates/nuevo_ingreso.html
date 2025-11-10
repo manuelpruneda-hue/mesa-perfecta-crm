@@ -1,0 +1,136 @@
+﻿<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Nuevo Ingreso Ã¢â‚¬â€œ Mesa Perfecta</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="mp-dark" class="bg-dark">
+<nav class="navbar navbar-dark bg-dark mb-4">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">Mesa Perfecta Ã¢â‚¬â€œ Sistema de GestiÃƒÂ³n Financiera y CRM</a>
+    <div class="d-flex gap-2">
+      <a href="/" class="btn btn-outline-light btn-sm">Dashboard</a>
+      <a href="/ingresos" class="btn btn-outline-light btn-sm">Ingresos</a>
+      <a href="/egresos" class="btn btn-outline-light btn-sm">Egresos</a>
+      <a href="/crm" class="btn btn-outline-light btn-sm">CRM</a>
+      <a href="/reporte" class="btn btn-outline-light btn-sm">Reporte SII</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="mb-3">
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} shadow-sm" role="alert">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <h2 class="mb-3">Nuevo Ingreso</h2>
+
+  <form method="POST" action="{{ url_for('nuevo_ingreso') }}" class="card p-3 shadow-sm bg-white" id="form-nuevo-ingreso" novalidate>
+    <div class="row g-3">
+      <div class="col-md-3">
+        <label class="form-label">Fecha</label>
+        <input type="date" name="fecha" class="form-control" required>
+      </div>
+
+      <div class="col-md-5">
+        <label class="form-label">Cliente</label>
+        <input type="text" name="cliente" class="form-control" list="clientes-list" placeholder="Ej: PanaderÃƒÂ­a San JosÃƒÂ©" required>
+        <datalist id="clientes-list">
+          {% for c in clientes %}
+            <option value="{{ c['nombre'] }}"></option>
+          {% endfor %}
+        </datalist>
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Medio de pago</label>
+        <input type="text" name="medio_pago" class="form-control" placeholder="Transferencia / Efectivo / Tarjeta" required>
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Tipo de documento</label>
+        <input type="text" name="tipo_doc" class="form-control" placeholder="Boleta / Factura" required>
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">Monto neto</label>
+        <input type="number" step="0.01" min="0" name="monto_neto" class="form-control" placeholder="0" required>
+        <div class="form-text">Se calcularÃƒÂ¡ IVA (19%) y Total automÃƒÂ¡ticamente.</div>
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label d-block">CÃƒÂ¡lculo</label>
+        <div class="small text-muted">IVA dÃƒÂ©bito: <strong id="iva-muestra">$0</strong></div>
+        <div class="small text-muted">Total: <strong id="total-muestra">$0</strong></div>
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label">CategorÃƒÂ­a</label>
+        <input type="text" name="categoria" class="form-control" placeholder="ventas diarias / servicios / otros">
+      </div>
+
+      <div class="col-12">
+        <label class="form-label">Observaciones</label>
+        <textarea name="observaciones" class="form-control" rows="3" placeholder="Detalle opcional..."></textarea>
+      </div>
+    </div>
+
+    <div class="mt-3 d-flex gap-2">
+      <button type="submit" class="btn btn-success">Ã°Å¸â€™Â¾ Guardar</button>
+      <a href="{{ url_for('ingresos') }}" class="btn btn-secondary">Cancelar</a>
+    </div>
+  </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+(function() {
+  const form = document.getElementById('form-nuevo-ingreso');
+  const fecha = form.querySelector('input[name="fecha"]');
+  const neto = form.querySelector('input[name="monto_neto"]');
+  const ivaSpan = document.getElementById('iva-muestra');
+  const totalSpan = document.getElementById('total-muestra');
+  const fmt = new Intl.NumberFormat('es-CL');
+
+  // Fecha por defecto = hoy
+  if (!fecha.value) {
+    const now = new Date();
+    fecha.value = now.toISOString().slice(0,10);
+  }
+
+  function recalc() {
+    const v = parseFloat((neto.value || '').toString().replace(',', '.')) || 0;
+    const iva = Math.round(v * 0.19 * 100) / 100;
+    const total = Math.round((v + iva) * 100) / 100;
+    ivaSpan.textContent = '$' + fmt.format(iva);
+    totalSpan.textContent = '$' + fmt.format(total);
+  }
+
+  neto.addEventListener('input', recalc);
+  recalc();
+
+  form.addEventListener('submit', (e) => {
+    const v = parseFloat((neto.value || '').toString().replace(',', '.'));
+    if (isNaN(v) || v < 0) {
+      e.preventDefault();
+      neto.classList.add('is-invalid');
+    } else {
+      neto.classList.remove('is-invalid');
+    }
+  });
+})();
+</script>
+</body>
+</html>
+
+
+
+

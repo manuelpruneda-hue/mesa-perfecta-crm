@@ -1,0 +1,103 @@
+﻿<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Maestro de Clientes Ã¢â‚¬â€œ Mesa Perfecta</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="mp-dark" class="bg-dark">
+<nav class="navbar navbar-dark bg-dark mb-4">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="/">Mesa Perfecta</a>
+    <div class="d-flex gap-2">
+      <a href="/" class="btn btn-outline-light btn-sm">Dashboard</a>
+      <a href="/ingresos" class="btn btn-outline-light btn-sm">Ingresos</a>
+      <a href="/egresos" class="btn btn-outline-light btn-sm">Egresos</a>
+      <a href="/crm" class="btn btn-outline-light btn-sm">CRM</a>
+      <a href="/proveedores" class="btn btn-outline-light btn-sm">Resumen Proveedores</a>
+      <a href="/maestro/proveedores" class="btn btn-outline-light btn-sm">Maestro Proveedores</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="mb-3">
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }} shadow-sm" role="alert">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <div class="d-flex justify-content-between align-items-center mb-2">
+    <h2 class="m-0">Maestro de Clientes</h2>
+    <a href="{{ url_for('clientes_nuevo') }}" class="btn btn-primary">+ Nuevo Cliente</a>
+  </div>
+
+  <table class="table table-striped table-hover align-middle">
+    <thead class="table-dark">
+      <tr>
+        <th>Nombre</th>
+        <th>RUT</th>
+        <th>Giro</th>
+        <th>Contacto</th>
+        <th>Comuna</th>
+        <th>Activo</th>
+        <th class="text-center">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in clientes %}
+      <tr>
+        <td>{{ c['nombre'] }}</td>
+        <td>{{ c['rut'] }}</td>
+        <td>{{ c['giro'] }}</td>
+        <td>
+          <div class="small">{{ c['telefono'] }}</div>
+          <div class="small">{{ c['email'] }}</div>
+        </td>
+        <td>{{ c['comuna'] }}</td>
+        <td>{{ 'SÃƒÂ­' if c['activo'] else 'No' }}</td>
+        <td class="text-center">
+          <a href="{{ url_for('clientes_editar', cid=c['id']) }}" class="btn btn-sm btn-primary">Ã¢Å“ÂÃ¯Â¸Â Editar</a>
+          <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#del{{ c['id'] }}">Ã°Å¸â€”â€˜Ã¯Â¸Â Borrar</button>
+          <div class="modal fade" id="del{{ c['id'] }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+              <form class="modal-content" method="POST" action="{{ url_for('clientes_borrar', cid=c['id']) }}">
+                <div class="modal-header">
+                  <h5 class="modal-title">Borrar cliente</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                  <p>Confirma borrado de <strong>{{ c['nombre'] }}</strong>.</p>
+                  <label class="form-label">ContraseÃƒÂ±a</label>
+                  <input type="password" name="password" class="form-control" required>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                  <button type="submit" class="btn btn-danger">SÃƒÂ­, borrar</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="7" class="text-center text-muted">AÃƒÂºn no hay clientes.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <a href="/" class="btn btn-secondary">Volver</a>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+
+

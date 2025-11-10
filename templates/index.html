@@ -1,0 +1,45 @@
+﻿{% extends "layout.html" %}
+
+{% block title %}Dashboard â€” Mesa Perfecta{% endblock %}
+
+{% block content %}
+  <h1 class="mb-4">Resumen general</h1>
+
+  <div class="row g-3">
+    <div class="col-12">
+      <div class="mp-card p-3">
+        <div class="mp-card-title">Total de Ingresos</div>
+        <div class="mp-card-value">${{ "{:,.0f}".format(total_ingresos|float) }}</div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="mp-card p-3">
+        <div class="mp-card-title">Total de Egresos</div>
+        <div class="mp-card-value">${{ "{:,.0f}".format(total_egresos|float) }}</div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="mp-card p-3">
+        <div class="mp-card-title">Ganancia Neta</div>
+        <div class="mp-card-value">${{ "{:,.0f}".format(neto|float) }}</div>
+      </div>
+    </div>
+
+    <div class="col-12">
+      <div class="mp-card p-3">
+        <div class="mp-card-title">IVA Neto</div>
+        <div class="mp-card-value">${{ "{:,.0f}".format(iva_neto|float) }}</div>
+      </div>
+    </div>
+  </div>
+
+  {% if pending_mp and pending_mp|int > 0 %}
+    <div class="alert alert-warning mt-4">
+      Tienes {{ pending_mp }} pago(s) de Mercado Pago pendientes de actualizaciÃ³n.
+    </div>
+  {% endif %}
+{% endblock %}
+
+

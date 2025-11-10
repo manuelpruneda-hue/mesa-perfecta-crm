@@ -1,0 +1,88 @@
+{% extends "layout.html" %}
+{% block title %}Egresos · Mesa Perfecta{% endblock %}
+{% block content %}
+
+<div class="container py-5">
+  <h1 class="h3 mb-4 brand">Listado de Egresos</h1>
+
+  <form class="row g-2 mb-3" method="get" action="{{ url_for('egresos') }}">
+    <div class="col-md-6">
+      <input name="q" class="form-control" placeholder="Proveedor, medio de pago, categoría, observaciones" value="{{ request.args.get('q','') }}">
+    </div>
+    <div class="col-md-2">
+      <input name="desde" type="date" class="form-control" value="{{ request.args.get('desde','') }}">
+    </div>
+    <div class="col-md-2">
+      <input name="hasta" type="date" class="form-control" value="{{ request.args.get('hasta','') }}">
+    </div>
+    <div class="col-md-2 d-grid">
+      <button class="btn btn-primary" type="submit">Buscar</button>
+    </div>
+  </form>
+
+  <div class="row g-3 mb-4">
+    <div class="col-md-4">
+      <div class="card shadow-sm"><div class="card-body">
+        <div class="text-muted">Neto</div><div class="h4">$ {{ '{:,.0f}'.format(sum_neto) }}</div>
+      </div></div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-sm"><div class="card-body">
+        <div class="text-muted">IVA crédito</div><div class="h4">$ {{ '{:,.0f}'.format(sum_iva) }}</div>
+      </div></div>
+    </div>
+    <div class="col-md-4">
+      <div class="card shadow-sm"><div class="card-body">
+        <div class="text-muted">Total</div><div class="h4">$ {{ '{:,.0f}'.format(sum_total) }}</div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="d-flex gap-2 mb-3">
+    <a class="btn btn-success" href="{{ url_for('nuevo_egreso') }}">Nuevo Gasto</a>
+    <a class="btn btn-outline-success" href="{{ url_for('exportar_egresos', **request.args) }}">Exportar CSV</a>
+    <a class="btn btn-secondary ms-auto" href="{{ url_for('index') }}">Volver al Dashboard</a>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table table-dark table-striped align-middle">
+      <thead>
+        <tr>
+          <th>Fecha</th><th>Proveedor</th><th>Medio de pago</th><th>Tipo de documento</th>
+          <th class="text-end">Monto neto</th><th class="text-end">IVA crédito</th><th class="text-end">Total</th>
+          <th>Categoría</th><th>Observaciones</th><th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% if egresos %}
+        {% for r in egresos %}
+        <tr>
+          <td>{{ r['fecha'] }}</td>
+          <td>{{ r['proveedor'] }}</td>
+          <td>{{ r['medio_pago'] }}</td>
+          <td>{{ r['tipo_doc'] }}</td>
+          <td class="text-end">$ {{ '{:,.0f}'.format(r['monto_neto'] or 0) }}</td>
+          <td class="text-end">$ {{ '{:,.0f}'.format(r['iva_credito'] or 0) }}</td>
+          <td class="text-end">$ {{ '{:,.0f}'.format(r['total'] or 0) }}</td>
+          <td>{{ r['categoria'] }}</td>
+          <td>{{ r['observaciones'] }}</td>
+          <td class="text-nowrap">
+            <a class="btn btn-sm btn-outline-light" href="{{ url_for('editar_egreso', item_id=r['id']) }}">Editar</a>
+            <form class="d-inline" method="post" action="{{ url_for('borrar_egreso', item_id=r['id']) }}" onsubmit="return confirm('¿Borrar egreso?');">
+              {% if not current_user or current_user.username != SUPER_ADMIN_USERNAME %}
+              <input type="password" class="form-control form-control-sm d-inline w-auto" name="password" placeholder="Contraseña" required>
+              {% endif %}
+              <button class="btn btn-sm btn-danger">Borrar</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      {% else %}
+        <tr><td colspan="10" class="text-center text-muted">No hay egresos con ese filtro.</td></tr>
+      {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

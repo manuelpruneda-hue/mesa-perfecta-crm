@@ -1,0 +1,47 @@
+{% extends "layout.html" %}{% block title %}Inventario{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="m-0">Inventario</h3>
+  <a class="btn btn-primary" href="{{ url_for('inventario_nuevo_item') }}">Ã¢Å¾â€¢ Nuevo ÃƒÂ­tem</a>
+</div>
+
+{% if alertas and alertas|length %}
+<div class="alert alert-warning">Ã¢Å¡Â Ã¯Â¸Â ÃƒÂtems bajo umbral:
+  {% for a in alertas %}<span class="badge text-bg-warning me-1">{{ a.nombre }}</span>{% endfor %}
+</div>
+{% endif %}
+
+<table class="table table-sm table-striped align-middle">
+  <thead><tr><th>ÃƒÂtem</th><th>Unidad</th><th>Stock</th><th>Umbral</th><th>Costo unit.</th><th>CategorÃƒÂ­a</th><th class="text-end">Ajuste</th></tr></thead>
+  <tbody>
+    {% for it in items %}
+    <tr>
+      <td>{{ it.nombre }}</td>
+      <td>{{ it.unidad }}</td>
+      <td>{{ it.stock }}</td>
+      <td>{{ it.umbral_min }}</td>
+      <td>${{ '%.0f'|format(it.costo_unitario or 0) }}</td>
+      <td>{{ it.categoria }}</td>
+      <td class="text-end">
+        <form class="row g-1" method="post" action="{{ url_for('inventario_ajuste', item_id=it.id) }}">
+          <div class="col">
+            <select class="form-select form-select-sm" name="tipo">
+              <option value="entrada">entrada</option><option value="salida">salida</option>
+            </select>
+          </div>
+          <div class="col"><input class="form-control form-control-sm" name="cantidad" type="number" step="0.01" placeholder="cant" required></div>
+          <div class="col"><input class="form-control form-control-sm" name="costo_unit" type="number" step="0.01" placeholder="$ costo"></div>
+          <div class="col"><input class="form-control form-control-sm" name="lote" placeholder="lote"></div>
+          <div class="col"><input class="form-control form-control-sm" name="vence" type="date"></div>
+          <div class="col"><button class="btn btn-sm btn-outline-primary">Aplicar</button></div>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
+
+
+
+

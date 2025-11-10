@@ -1,0 +1,127 @@
+/* =========================
+   Mesa Perfecta â€” Estilos MP
+   ========================= */
+:root{
+  --mp-bg: #0f1113;         /* negro grafito */
+  --mp-panel: #161a1d;      /* gris carbÃ³n */
+  --mp-text: #e9ecef;       /* texto claro */
+  --mp-muted:#9aa3ab;       /* texto secundario */
+  --mp-gold:#f1b60a;        /* dorado MP */
+  --mp-gold-soft:#ffd24d;   /* dorado suave para Ã©nfasis */
+  --mp-accent:#2b3035;      /* bordes/sombras */
+  --mp-ok:#1db954;          /* verde ok */
+  --mp-danger:#ff4757;      /* rojo acciÃ³n */
+}
+
+html, body{
+  background: var(--mp-bg);
+  color: var(--mp-text);
+  font-family: 'Montserrat', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  overflow-x: hidden; /* evita scroll horizontal */
+}
+
+/* Nav */
+.mp-navbar{
+  background: #0b0d0f;
+  border-bottom: 1px solid #1f2326;
+}
+.navbar .nav-link{
+  color: var(--mp-muted);
+  font-weight: 500;
+}
+.navbar .nav-link:hover,
+.navbar .nav-link.active{
+  color: var(--mp-gold);
+}
+.mp-brand-logo{ width:28px; height:28px; opacity:.9; }
+.mp-brand-text{ color:#fff; letter-spacing:.2px; }
+
+/* Botones base */
+.btn{ font-weight:600; letter-spacing:.2px; }
+.btn-outline-light{ border-color:#3a3f44; }
+
+/* Tarjetas/paneles (si los usas) */
+.card{
+  background: var(--mp-panel);
+  border: 1px solid var(--mp-accent);
+  color: var(--mp-text);
+}
+.card .card-title{ color:#fff; }
+
+/* Listas y tablas */
+.table{
+  color: var(--mp-text);
+  border-color: var(--mp-accent);
+}
+.table thead th{
+  color:#d9dee3;
+  border-bottom-color: var(--mp-accent);
+}
+.table tbody tr{
+  background: var(--mp-panel);
+}
+.table tbody tr:nth-child(even){
+  background: #1a1f23;
+}
+
+/* TÃ­tulos */
+h1, .display-1, .display-2{
+  color:#fff;
+  font-weight:700;
+  letter-spacing:.4px;
+}
+h2,h3,h4{ color:#f7f7f7; }
+
+/* KPIs */
+.kpi{
+  background: linear-gradient(180deg, #151a1e 0%, #101317 100%);
+  border:1px solid #23282d;
+  border-radius:12px;
+  padding:16px 18px;
+}
+.kpi .kpi-label{ color:var(--mp-muted); font-weight:600; }
+.kpi .kpi-value{ color:var(--mp-gold-soft); font-weight:800; font-size:1.6rem; }
+
+/* Logos laterales fijos */
+.mp-logo-left, .mp-logo-right{
+  position: fixed;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: .06;
+  pointer-events: none;
+  z-index: 0;
+}
+.mp-logo-left{ left: 2rem;  width: 140px; }
+.mp-logo-right{ right: 2rem; width: 180px; }
+
+@media (max-width: 1200px){
+  .mp-logo-left, .mp-logo-right{ display:none; }
+}
+
+/* Asegura que el contenido estÃ© por encima de los logos */
+main, .container, .container-xxl, .container-fluid{ position:relative; z-index:1; }
+
+/* Formularios */
+.form-control, .form-select{
+  background:#121519;
+  color:#e6e6e6;
+  border:1px solid #2a2f34;
+}
+.form-control:focus, .form-select:focus{
+  background:#121519;
+  color:#fff;
+  border-color:#3a4047;
+  box-shadow: 0 0 0 .25rem rgba(241,182,10,.08);
+}
+
+/* Badges/labels */
+.badge{ font-weight:600; }
+.badge-gold{ background:var(--mp-gold); color:#1b1f23; }
+
+/* Footer */
+footer{ color:var(--mp-muted); border-top:1px solid #1f2326; }
+
+/* Utilidades */
+.text-gold{ color:var(--mp-gold); }
+.border-accent{ border-color:var(--mp-accent)!important; }
+.bg-panel{ background:var(--mp-panel)!important; }

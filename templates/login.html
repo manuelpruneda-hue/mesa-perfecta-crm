@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+{% block title %}Iniciar sesión · Mesa Perfecta{% endblock %}
+{% block content %}
+
+<div class="container py-5">
+  <div class="card shadow" style="max-width: 420px; margin: 0 auto; border-radius: 18px;">
+    <div class="card-body p-4 text-center">
+      <h1 class="h4 mb-4 brand">Mesa Perfecta · Login</h1>
+
+      {% with msgs = get_flashed_messages(with_categories=true) %}
+      {% if msgs %}
+        {% for cat, msg in msgs %}
+          <div class="alert alert-{{ 'warning' if cat == 'warning' else ('danger' if cat == 'error' else cat) }}">{{ msg }}</div>
+        {% endfor %}
+      {% endif %}
+      {% endwith %}
+
+      <form method="post" action="{{ url_for('login') }}">
+        <div class="mb-3 text-start">
+          <label class="form-label">Usuario</label>
+          <input type="text" name="username" class="form-control" required>
+        </div>
+
+        <div class="mb-3 text-start">
+          <label class="form-label">Contraseña</label>
+          <input type="password" name="password" class="form-control" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 mt-3">Entrar</button>
+      </form>
+
+      <p class="text-muted mt-3 small">Tip: usuario <strong>admin</strong> / clave <strong>admin123</strong></p>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

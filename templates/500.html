@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block title %}Error 500 - Mesa Perfecta{% endblock %}
+
+{% block content %}
+<div style="text-align:center; padding: 40px;">
+  <h1 style="color:#d4af37; font-size:2.2rem;">🥣 Se nos cayó una olla</h1>
+  <p style="margin-top:15px; font-size:1.1rem;">
+    Algo se desbordó en la cocina del servidor.<br>
+    No te preocupes, estamos limpiando el desastre.
+  </p>
+  <p style="margin-top:20px;">
+    <a href="{{ url_for('index') }}" class="button">Volver al Dashboard</a>
+  </p>
+</div>
+{% endblock %}

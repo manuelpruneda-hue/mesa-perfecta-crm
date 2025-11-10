@@ -1,0 +1,38 @@
+﻿{% extends "layout.html" %}{% block title %}Transferencia{% endblock %}
+{% block content %}
+<h3>Nueva transferencia</h3>
+<form method="post" class="row g-3">
+  <div class="col-md-6">
+    <label class="form-label">Origen</label>
+    <select class="form-select" name="origen" required>
+      {% for c in cuentas %}<option value="{{ c.id }}">{{ c.alias }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Destino</label>
+    <select class="form-select" name="destino" required>
+      {% for c in cuentas %}<option value="{{ c.id }}">{{ c.alias }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Monto</label>
+    <input class="form-control" type="number" step="0.01" name="monto" required>
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Fecha</label>
+    <input class="form-control" type="date" name="fecha">
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Glosa</label>
+    <input class="form-control" name="glosa">
+  </div>
+  <div class="col-12">
+    <button class="btn btn-primary">Guardar</button>
+    <a class="btn btn-outline-secondary" href="{{ url_for('cuentas_list') }}">Cancelar</a>
+  </div>
+</form>
+{% endblock %}
+
+
+
+

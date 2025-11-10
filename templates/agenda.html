@@ -1,0 +1,24 @@
+{% extends "layout.html" %}{% block title %}Agenda{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="m-0">Agenda</h3>
+  <a class="btn btn-primary" href="{{ url_for('agenda_nuevo') }}">Ã¢Å¾â€¢ Nuevo evento</a>
+</div>
+<table class="table table-sm table-striped">
+  <thead><tr><th>Inicio</th><th>Fin</th><th>TÃƒÂ­tulo</th><th>Lugar</th></tr></thead>
+  <tbody>
+    {% for e in eventos %}
+      <tr>
+        <td>{{ e.fecha_inicio }}</td>
+        <td>{{ e.fecha_fin }}</td>
+        <td>{{ e.titulo }}</td>
+        <td>{{ e.lugar }}</td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
+
+
+
+

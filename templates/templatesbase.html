@@ -1,0 +1,78 @@
+﻿<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Mesa Perfecta Ã¢â‚¬â€ {% block title %}{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    rel="stylesheet">
+  <style>
+    body { background:#f7f8fa; }
+    .navbar-dark .nav-link.active { font-weight:700; }
+    .container-narrow { max-width: 1200px; }
+  </style>
+</head>
+<body class="mp-dark">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="{{ url_for('index') }}">Mesa Perfecta Ã¢â‚¬â€œ CRM</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="nav">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('index') }}">Dashboard</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('ingresos') }}">Ingresos</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('egresos') }}">Egresos</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('crm') }}">CRM</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('proveedores_resumen') }}">Proveedores</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('reporte') }}">Reporte SII</a></li>
+
+        <!-- Nuevos mÃƒÂ³dulos -->
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('cuentas_list') }}">Cuentas</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('transferencia_nueva') }}">Transferencia</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('agenda') }}">Agenda</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('pedidos') }}">Pedidos</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('inventario') }}">Inventario</a></li>
+        <li class="nav-item"><a class="nav-link" href="{{ url_for('bom_list') }}">BOM</a></li>
+
+        {% if session.get("user") and session.get("user").role == "admin" %}
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" data-bs-toggle="dropdown" href="#">Ajustes</a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="{{ url_for('usuarios_list') }}">Usuarios</a></li>
+          </ul>
+        </li>
+        {% endif %}
+      </ul>
+
+      <span class="navbar-text me-3">
+        {% if session.get("user") %}Ã°Å¸â€˜Â¤ {{ session.get("user").username }} ({{ session.get("user").role }}){% endif %}
+      </span>
+      {% if session.get("user") %}
+      <a class="btn btn-outline-light btn-sm" href="{{ url_for('logout') }}">Salir</a>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+<main class="container container-narrow my-4">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for cat, msg in messages %}
+        <div class="alert alert-{{ cat }} small">{{ msg|safe }}</div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+
+
+

@@ -1,0 +1,19 @@
+{% extends "layout.html" %}{% block title %}Cuentas{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h3 class="m-0">Cuentas</h3>
+  <a class="btn btn-primary" href="{{ url_for('transferencia_nueva') }}">Ã¢Å¾â€¢ Nueva transferencia</a>
+</div>
+<table class="table table-sm table-striped">
+  <thead><tr><th>Cuenta</th><th>Saldo calculado</th></tr></thead>
+  <tbody>
+    {% for cta, saldo in saldos %}
+      <tr><td>{{ cta.alias }}</td><td>${{ '%.0f'|format(saldo) }}</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
+
+
+
+

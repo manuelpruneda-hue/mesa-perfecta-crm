@@ -1,0 +1,39 @@
+{% extends "layout.html" %}
+{% block title %}Transferencias{% endblock %}
+{% block content %}
+<h1>Transferencias internas</h1>
+
+<p>
+  <a class="button" href="{{ url_for('transferencia_nueva') }}">➕ Nueva transferencia</a>
+  <a class="button" href="{{ url_for('cuentas_list') }}">← Volver a Cuentas</a>
+</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Fecha</th>
+      <th>Origen</th>
+      <th>Destino</th>
+      <th>Monto</th>
+      <th>Glosa</th>
+      <th>Creado</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for t in transferencias %}
+    <tr>
+      <td>{{ t.id }}</td>
+      <td>{{ t.fecha }}</td>
+      <td><span class="tag">{{ t.origen_alias }}</span></td>
+      <td><span class="tag">{{ t.destino_alias }}</span></td>
+      <td>${{ '%.0f'|format(t.monto or 0) }}</td>
+      <td>{{ t.glosa }}</td>
+      <td>{{ t.created_at }}</td>
+    </tr>
+    {% else %}
+    <tr><td colspan="7">No hay transferencias registradas.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

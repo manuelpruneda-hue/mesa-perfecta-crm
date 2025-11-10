@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block title %}Error interno{% endblock %}
+{% block content %}
+<h1>Ups… algo salió mal 🔧</h1>
+<p>Ocurrió un error interno mientras procesábamos tu solicitud.</p>
+{% if error_message %}
+<pre style="background:#fff4f4;border:1px solid #f6caca;padding:12px;border-radius:8px;white-space:pre-wrap;">
+{{ error_message }}
+</pre>
+{% endif %}
+<p><a class="button" href="{{ url_for('index') }}">Volver al inicio</a></p>
+{% endblock %}

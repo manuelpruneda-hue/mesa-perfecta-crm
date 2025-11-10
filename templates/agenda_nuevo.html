@@ -1,0 +1,45 @@
+﻿{% extends "layout.html" %}{% block title %}Nuevo evento{% endblock %}
+{% block content %}
+<h3>Nuevo evento</h3>
+<form method="post" class="row g-3">
+  <div class="col-md-6">
+    <label class="form-label">TÃƒÂ­tulo</label>
+    <input class="form-control" name="titulo" required>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Cliente (opcional)</label>
+    <select class="form-select" name="cliente_id">
+      <option value="">Ã¢â‚¬â€</option>
+      {% for c in clientes %}<option value="{{ c.id }}">{{ c.nombre }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Inicio</label>
+    <input class="form-control" type="datetime-local" name="fecha_inicio" required>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Fin</label>
+    <input class="form-control" type="datetime-local" name="fecha_fin">
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Lugar</label>
+    <input class="form-control" name="lugar">
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Recordatorio (min)</label>
+    <input class="form-control" type="number" name="recordatorio_minutos" value="1440">
+  </div>
+  <div class="col-12">
+    <label class="form-label">DescripciÃƒÂ³n</label>
+    <textarea class="form-control" name="descripcion" rows="3"></textarea>
+  </div>
+  <div class="col-12">
+    <button class="btn btn-primary">Guardar</button>
+    <a class="btn btn-outline-secondary" href="{{ url_for('agenda') }}">Cancelar</a>
+  </div>
+</form>
+{% endblock %}
+
+
+
+
